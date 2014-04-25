@@ -32,10 +32,12 @@ class krakenapi:
 
     def public_request(self, method, body={}):
         h = httplib2.Http()
-        resp, content = h.request(self.uri + '/0/public/' + method);        
+        resp, content = h.request(self.uri + '/0/public/' + method, 'POST', body=urllib.parse.urlencode(body));
         if resp['status'] == '200':
             data = json.loads(content.decode())
-            return(data['result'])
+            if data['error'] == []:
+                return(data['result'])
+            print('[ERROR] => ' + method + ': ' + data['error'][0])
         return(None)
 
     def get_server_time(self):
@@ -126,25 +128,14 @@ class krakenapi:
             return(data['result']['open'])
         return(None)
 
-
-    def get_order_book(self):
-        path = '/0/public/Depth'
-        nonce = int(time.time() * 1000)
-        body = {
-            'nonce': str(nonce),
-            'pair': 'XXBTXLTC',
-            'count': 3
-            }
-        self.sign(path, str(nonce), urllib.parse.urlencode(body))
-        headers = {
-            'API-Key': self.key,
-            'API-Sign': self.signature.decode()
-            }
-        h = httplib2.Http()
-        resp, content = h.request(self.uri + path, 'POST', headers=headers, body=urllib.parse.urlencode(body));
-        if resp['status'] == '200':
-            data = json.loads(content.decode())
-            return(data['result'])
+    def get_order_book(self, pair, count=None):
+        body = {}
+        body['pair'] = pair
+        if count:
+            body['count'] = count
+        data = self.public_request('Depth', body)
+        if data:
+            return(data[pair])
         return(None)
 
     def add_standard_order(self, pair, action, order_type, price, volume):
