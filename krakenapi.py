@@ -67,12 +67,12 @@ class krakenapi:
             return(data)
         return(None)
 
-    def get_asset_ticker(self, pair):
-        h = httplib2.Http()
+    def get_ticker_information(self, pair):
         body = {'pair': pair}
-        resp, content = h.request(self.uri + '/0' + '/public' + '/Ticker', 'POST', body=urllib.parse.urlencode(body));
-        data = json.loads(content.decode())
-        return(float(data['result'][pair]['c'][0]))
+        data = self.public_request('Ticker', body)
+        if data:
+            return(data)
+        return(None)
 
     def get_balance(self):
         path = '/0/private/Balance'
