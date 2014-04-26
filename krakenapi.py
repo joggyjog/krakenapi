@@ -46,16 +46,18 @@ class krakenapi:
             return(data['unixtime'], data['rfc1123'])
         return(None, None)
 
-    def get_asset_info(self, currency=None):
-        h = httplib2.Http()
-        resp, content = h.request(self.uri + '/0' + '/public' + '/Assets');
-        data = json.loads(content.decode())
-        if not currency:
-            for elem in data['result']:
-                print(elem)
-                print(data['result'][elem])
-        else:
-            print(data['result'][currency])
+    def get_asset_info(self, info=None, aclass=None, asset=None):
+        body = {}
+        if info:
+            body['info'] = info
+        if aclass:
+            body['aclass'] = aclass
+        if asset:
+            body['asset'] = asset
+        data = self.public_request('Assets', body)
+        if data:
+            return(data)
+        return(None)
 
     def get_asset_pairs(self, pair=None):
         h = httplib2.Http()
