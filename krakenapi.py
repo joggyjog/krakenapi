@@ -46,12 +46,10 @@ class krakenapi:
             return(data['unixtime'], data['rfc1123'])
         return(None, None)
 
-    def get_asset_info(self, info=None, aclass=None, asset=None):
+    def get_asset_info(self, info='info', aclass='currency', asset=None):
         body = {}
-        if info:
-            body['info'] = info
-        if aclass:
-            body['aclass'] = aclass
+        body['info'] = info
+        body['aclass'] = aclass
         if asset:
             body['asset'] = asset
         data = self.public_request('Assets', body)
@@ -59,19 +57,15 @@ class krakenapi:
             return(data)
         return(None)
 
-    def get_asset_pairs(self, pair=None):
-        h = httplib2.Http()
-        if not pair:
-            resp, content = h.request(self.uri + '/0' + '/public' + '/AssetPairs', 'POST');
-            data = json.loads(content.decode())
-            for elem in data['result']:
-                print(elem)
-                print(data['result'][elem])
-        else:
-            body = {'pair': pair}
-            resp, content = h.request(self.uri + '/0' + '/public' + '/AssetPairs', 'POST', body=urllib.parse.urlencode(body));
-            data = json.loads(content.decode())
-            print(data['result'][pair])
+    def get_tradable_asset_pairs(self, info='info', pair=None):
+        body = {}
+        body['info'] = info
+        if pair:
+            body['pair'] = info
+        data = self.public_request('AssetPairs', body)
+        if data:
+            return(data)
+        return(None)
 
     def get_asset_ticker(self, pair):
         h = httplib2.Http()
